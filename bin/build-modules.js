@@ -33,9 +33,13 @@ function buildPackage(pkg) {
 readDir('packages/node_modules').then(function (packages) {
   // `pouchdb-for-coverage` has to be built last because it depends on
   // `pouchdb`, which has a particular index.es.js file as its jsnext:main
+  // `pouchdb` has to be built last due to dep on pouchdb-browser/pouchdb-node
   return Promise.all(packages.filter(function (pkg) {
-    return pkg !== 'pouchdb-for-coverage';
+    return pkg !== 'pouchdb-for-coverage' &&
+      pkg !== 'pouchdb';
   }).map(buildPackage)).then(function () {
+    return buildPackage('pouchdb');
+  }).then(function () {
     return buildPackage('pouchdb-for-coverage');
   });
 }).catch(function (err) {
